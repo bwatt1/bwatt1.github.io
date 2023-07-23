@@ -1,9 +1,18 @@
+* {
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
 #header {
     top: 0px;
     background-color: black;
     font-family: Verdana, sans-serif;
     position: sticky;
     z-index: 10000;
+}
+
+body {
+    
+    overflow-y: scroll;
 }
 
 .container {
