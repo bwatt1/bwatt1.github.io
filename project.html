@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Project</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta name="author" content="Ben Watt">
+</head>
+
+<body>
+    <div id="header">
+        <div class="container">
+            <h1 id="name-title">Ben Watt</h1>
+            <nav id="navbar">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a class="active" href="projects.html">Projects</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <main id="project-readme">
+        <h1 id="project-title"></h1>
+
+        <a id="github-link" target="_blank" class="github-button">
+            View on GitHub
+        </a>
+
+        <div id="readme-content">
+            Loading README...
+        </div>
+    </main>
+
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        const username = "bwatt1";
+        const params = new URLSearchParams(window.location.search);
+        const repo = params.get("repo");
+
+        const titleEl = document.getElementById("project-title");
+        const readmeEl = document.getElementById("readme-content");
+        const githubBtn = document.getElementById("github-link");
+
+        if (!repo) {
+            readmeEl.textContent =
+                "No project specified.";
+            throw new Error("No repo specified");
+        }
+
+        titleEl.textContent = repo;
+        githubBtn.href =
+            `https://github.com/${username}/${repo}`;
+
+        fetch('https//api.github.com/repos/${username}/${repo}/readme', {
+            headers: {
+                "Accept": "application/vnd.github.v3+json"
+            }
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Github API error: ${res.status}');
+            }
+            return res.json();
+        })
+        .then(data => {
+            const base64 = data.content.replace(/\n/g,"");
+            const markdown = decodeURIComponent(escape(atob(base64)));
+
+            readmeEl.innerHTML = marked.parse(markdown);
+        })
+
+        .catch(err => {
+            console.error(err);
+            readmeEl.innerHTML = '<p style="color: gray;"> README could not be loaded for this repository. </p>';
+        })
+
+
+    </script>
+</body>
+</html>
