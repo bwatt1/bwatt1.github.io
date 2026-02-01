@@ -27,68 +27,74 @@
         <!-- Dynamic project cards injected here -->
     </div>
 
-    <script>
-const username = "bwatt1"; // your GitHub username
+<script>
+const username = "bwatt1";
 const container = document.getElementById("project-page");
 
-// Placeholder images
-const placeholderImages = [
-    "img/esk8_r1_img1.jpg",
-    "img/esc_img1.jpg",
-    "img/tbc.jpg"
-];
+const placeholderImg = "img/placeholder.jpg";
+const imageExtensions = ["png", "jpg", "jpeg", "webp"];
 
 fetch(`https://api.github.com/users/${username}/repos?sort=updated`)
     .then(res => res.json())
     .then(repos => {
-        repos.forEach((repo, index) => {
-            // Skip the GitHub Pages repo
+        repos.forEach(repo => {
+
+            // Hide GitHub Pages repo
             if (repo.name.toLowerCase() === `${username}.github.io`) return;
 
             const project = document.createElement("a");
-            project.classList.add("project");
+            project.className = "project";
             project.href = `project.html?repo=${repo.name}`;
 
-            project.target = "_blank";
-
-            // Random placeholder image
             const img = document.createElement("img");
-            img.classList.add("project-img");
-            img.src = placeholderImages[index % placeholderImages.length];
+            img.className = "project-img";
             img.alt = repo.name;
+            img.src = placeholderImg; // default fallback
+
+            // Try loading projectcard image
+            let imageFound = false;
+            for (const ext of imageExtensions) {
+                const testImg = new Image();
+                const url = `https://raw.githubusercontent.com/${username}/${repo.name}/main/projectcard-img.${ext}`;
+
+                testImg.onload = () => {
+                    if (!imageFound) {
+                        img.src = url;
+                        imageFound = true;
+                    }
+                };
+
+                testImg.src = url;
+            }
 
             const titleDiv = document.createElement("div");
-            titleDiv.classList.add("project-title");
+            titleDiv.className = "project-title";
             titleDiv.textContent = repo.name;
 
             const descDiv = document.createElement("div");
-            descDiv.classList.add("project-desc");
+            descDiv.className = "project-desc";
 
             const nameDiv = document.createElement("div");
-            nameDiv.classList.add("project-name");
+            nameDiv.className = "project-name";
             nameDiv.textContent = repo.name;
 
             const dateDiv = document.createElement("div");
-            dateDiv.classList.add("project-date");
-            dateDiv.textContent = new Date(repo.created_at).toLocaleDateString();
+            dateDiv.className = "project-date";
+            dateDiv.textContent =
+                `Created ${new Date(repo.created_at).toLocaleDateString()}`;
 
             const longDiv = document.createElement("div");
-            longDiv.classList.add("project-longdesc");
-            longDiv.textContent = repo.description || "No description available.";
+            longDiv.className = "project-longdesc";
+            longDiv.textContent =
+                repo.description || "No description provided.";
 
-            descDiv.appendChild(nameDiv);
-            descDiv.appendChild(dateDiv);
-            descDiv.appendChild(longDiv);
-
-            project.appendChild(img);
-            project.appendChild(titleDiv);
-            project.appendChild(descDiv);
-
+            descDiv.append(nameDiv, dateDiv, longDiv);
+            project.append(img, titleDiv, descDiv);
             container.appendChild(project);
         });
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("GitHub fetch failed:", err));
+</script>
 
-    </script>
 </body>
 </html>

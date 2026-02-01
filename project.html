@@ -22,6 +22,8 @@
     </div>
 
     <main id="project-readme">
+        <a href="projects.html" id="back-button">← Back to Projects</a>
+
         <h1 id="project-title"></h1>
 
         <a id="github-link" target="_blank" class="github-button">
@@ -37,48 +39,44 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script>
-        const username = "bwatt1";
-        const params = new URLSearchParams(window.location.search);
-        const repo = params.get("repo");
+    const username = "bwatt1";
+    const params = new URLSearchParams(window.location.search);
+    const repo = params.get("repo");
 
-        const titleEl = document.getElementById("project-title");
-        const readmeEl = document.getElementById("readme-content");
-        const githubBtn = document.getElementById("github-link");
+    const titleEl = document.getElementById("project-title");
+    const readmeEl = document.getElementById("readme-content");
+    const githubBtn = document.getElementById("github-link");
 
-        if (!repo) {
-            readmeEl.textContent =
-                "No project specified.";
-            throw new Error("No repo specified");
+    if (!repo) {
+        readmeEl.textContent = "No project specified.";
+        throw new Error("No repo specified");
+    }
+
+    titleEl.textContent = repo;
+    githubBtn.href = `https://github.com/${username}/${repo}`;
+
+    fetch(`https://api.github.com/repos/${username}/${repo}/readme`, {
+        headers: {
+            "Accept": "application/vnd.github.v3+json"
         }
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`GitHub API error: ${res.status}`);
+        }
+        return res.json();
+    })
+    .then(data => {
+        const base64 = data.content.replace(/\n/g, "");
+        const markdown = atob(base64);
+        readmeEl.innerHTML = marked.parse(markdown);
+    })
+    .catch(err => {
+        console.error(err);
+        readmeEl.innerHTML =
+            "<p style='color: gray;'>README could not be loaded for this repository.</p>";
+    });
+</script>
 
-        titleEl.textContent = repo;
-        githubBtn.href =
-            `https://github.com/${username}/${repo}`;
-
-        fetch('https//api.github.com/repos/${username}/${repo}/readme', {
-            headers: {
-                "Accept": "application/vnd.github.v3+json"
-            }
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Github API error: ${res.status}');
-            }
-            return res.json();
-        })
-        .then(data => {
-            const base64 = data.content.replace(/\n/g,"");
-            const markdown = decodeURIComponent(escape(atob(base64)));
-
-            readmeEl.innerHTML = marked.parse(markdown);
-        })
-
-        .catch(err => {
-            console.error(err);
-            readmeEl.innerHTML = '<p style="color: gray;"> README could not be loaded for this repository. </p>';
-        })
-
-
-    </script>
 </body>
 </html>

@@ -180,6 +180,7 @@ body {
 #project-title {
     font-size: 36px;
     margin-bottom: 10px;
+    color: black;
 }
 
 .github-button {
@@ -216,4 +217,20 @@ body {
 
 #readme-content code {
     color: #9cdcfe;
+}
+
+#back-button {
+    display: inline-block;
+    margin: 20px;
+    margin-left: 20px;
+    background-color: black;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+#back-button:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
